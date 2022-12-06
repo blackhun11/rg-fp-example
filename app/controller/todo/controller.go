@@ -1,15 +1,10 @@
 package todo
 
 import (
-	"time"
 	"wb/app/model"
 
 	"gorm.io/gorm"
 )
-
-type Controller struct {
-	dbConn *gorm.DB
-}
 
 type Contract interface {
 	Get() []model.Todo
@@ -18,29 +13,32 @@ type Contract interface {
 	Delete()
 }
 
-func NewController(dbConn *gorm.DB) Contract {
-	return &Controller{
+type Todo struct {
+	dbConn *gorm.DB
+}
+
+func NewTodo(dbConn *gorm.DB) Contract {
+	return &Todo{
 		dbConn: dbConn,
 	}
 }
 
-func (c *Controller) Get() []model.Todo {
-	todos := make([]model.Todo, 0)
-	c.dbConn.Order("status").Order("created_at desc").Find(&todos)
-	return todos
+func (t Todo) Get() []model.Todo {
+	todo := model.Todo{}
+	return todo.Get(t.dbConn)
 }
 
-func (c *Controller) Insert(desc string) {
-	data := model.Todo{
-		Desc: desc,
-	}
-	c.dbConn.Create(&data)
+func (t Todo) Insert(desc string) {
+	todo := model.Todo{}
+	todo.Insert(t.dbConn, desc)
 }
 
-func (c *Controller) Update(id int, status bool) {
-	c.dbConn.Model(&model.Todo{}).Where("id = ?", id).Update("status", status)
+func (t Todo) Update(id int, status bool) {
+	todo := model.Todo{}
+	todo.Update(t.dbConn, id, status)
 }
 
-func (c *Controller) Delete() {
-	c.dbConn.Model(&model.Todo{}).Where("status = ?", true).Update("deleted_at", time.Now())
+func (t Todo) Delete() {
+	todo := model.Todo{}
+	todo.Delete(t.dbConn)
 }

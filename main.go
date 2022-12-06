@@ -18,7 +18,7 @@ func main() {
 	if err != nil {
 		panic(err)
 	}
-	todoController := cTodo.NewController(db.DBConn)
+	todoController := cTodo.NewTodo(db.DBConn)
 	todoHandler := todo.Handler{
 		Contract: todoController,
 	}
