@@ -1,0 +1,67 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Login</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+</head>
+
+<body>
+    <div class="flex items-center justify-center min-h-screen bg-gray-100">
+        <div class="px-8 py-6 mt-4 text-left bg-white shadow-lg">
+            <h3 class="text-2xl font-bold text-center">Login to your account</h3>
+            <div class="mt-4">
+                <div class="mt-4">
+                    <label class="block">Username<label>
+                            <input id="username" type="text" placeholder="Username"
+                                class="w-full px-4 py-2 mt-2 border rounded-md focus:outline-none focus:ring-1 focus:ring-blue-600"
+                                required>
+                </div>
+                <div class="mt-4">
+                    <label class="block">Password<label>
+                            <input id="password" type="password" placeholder="Password"
+                                class="w-full px-4 py-2 mt-2 border rounded-md focus:outline-none focus:ring-1 focus:ring-blue-600"
+                                required>
+                </div>
+                <div class="flex items-baseline justify-between">
+                    <button class="px-6 py-2 mt-4 text-white bg-blue-600 rounded-lg hover:bg-blue-900"
+                        onclick="login()">Login</button>
+                    <a href="/auth/register" class="text-sm text-blue-600 hover:underline">Register Now!</a>
+                </div>
+            </div>
+        </div>
+    </div>
+</body>
+
+</html>
+
+<script>
+    const login = () => {
+        let username = document.getElementById("username").value
+        let password = document.getElementById("password").value
+
+        let headers = new Headers()
+        headers.set('Authorization', 'Basic ' + btoa(username + ":" + password))
+
+        fetch("/auth/doLogin", {
+                method: 'POST',
+                headers
+            })
+            .then((response) => response.json())
+            .then((data) => {
+                alert(data.message)
+                username: document.getElementById("username").value = ""
+                password: document.getElementById("password").value = ""
+                window.location.href = "/todo"
+            })
+            .catch((error) => {
+                alert(error.message)
+                username: document.getElementById("username").value = ""
+                password: document.getElementById("password").value = ""
+            })
+
+    }
+</script>

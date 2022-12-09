@@ -29,13 +29,20 @@ func (t Todo) Get() []model.Todo {
 }
 
 func (t Todo) Insert(desc string) {
-	todo := model.Todo{}
-	todo.Insert(t.dbConn, desc)
+	todo := model.Todo{
+		Desc: desc,
+	}
+	todo.Insert(t.dbConn)
 }
 
 func (t Todo) Update(id int, status bool) {
-	todo := model.Todo{}
-	todo.Update(t.dbConn, id, status)
+	todo := model.Todo{
+		Model: gorm.Model{
+			ID: uint(id),
+		},
+		Status: status,
+	}
+	todo.Update(t.dbConn)
 }
 
 func (t Todo) Delete() {
