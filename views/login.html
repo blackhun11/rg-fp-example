@@ -50,15 +50,22 @@
                 method: 'POST',
                 headers
             })
-            .then((response) => response.json())
+            .then((response) => {
+                if (response.ok) {
+                    return response.json()
+                }
+                return Promise.reject(response)
+            })
             .then((data) => {
                 alert(data.message)
-                username: document.getElementById("username").value = ""
-                password: document.getElementById("password").value = ""
                 window.location.href = "/todo"
             })
-            .catch((error) => {
-                alert(error.message)
+            .catch((response) => {
+                response.json().then((json) => {
+                    alert(json.message)
+                })
+            })
+            .finally(() => {
                 username: document.getElementById("username").value = ""
                 password: document.getElementById("password").value = ""
             })

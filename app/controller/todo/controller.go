@@ -7,8 +7,8 @@ import (
 )
 
 type Contract interface {
-	Get() []model.Todo
-	Insert(desc string)
+	Get(userID int64) []model.Todo
+	Insert(desc string, userID int64)
 	Update(id int, status bool)
 	Delete()
 }
@@ -23,14 +23,17 @@ func NewTodo(dbConn *gorm.DB) Contract {
 	}
 }
 
-func (t Todo) Get() []model.Todo {
-	todo := model.Todo{}
+func (t Todo) Get(userID int64) []model.Todo {
+	todo := model.Todo{
+		UserID: userID,
+	}
 	return todo.Get(t.dbConn)
 }
 
-func (t Todo) Insert(desc string) {
+func (t Todo) Insert(desc string, userID int64) {
 	todo := model.Todo{
-		Desc: desc,
+		Desc:   desc,
+		UserID: userID,
 	}
 	todo.Insert(t.dbConn)
 }

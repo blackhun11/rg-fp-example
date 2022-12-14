@@ -5,6 +5,7 @@ import (
 	"html/template"
 	"net/http"
 	"path"
+	"strconv"
 	"wb/app/controller/todo"
 )
 
@@ -25,7 +26,9 @@ func (h Handler) Todo(w http.ResponseWriter, r *http.Request) {
 }
 
 func (h Handler) Get(w http.ResponseWriter, r *http.Request) {
-	todos := h.Contract.Get()
+	userIDstr := r.Context().Value("user_id").(string)
+	userID, _ := strconv.ParseInt(userIDstr, 10, 64)
+	todos := h.Contract.Get(userID)
 
 	w.Header().Set("Content-Type", "application/json")
 	json.NewEncoder(w).Encode(&todos)
@@ -40,10 +43,11 @@ func (h Handler) Insert(w http.ResponseWriter, r *http.Request) {
 	var response struct {
 		Message string `json:"message,omitempty"`
 	}
-
+	userIDstr := r.Context().Value("user_id").(string)
+	userID, _ := strconv.ParseInt(userIDstr, 10, 64)
 	response.Message = "Success to Insert"
 	json.NewDecoder(r.Body).Decode(&request)
-	h.Contract.Insert(request.Desc)
+	h.Contract.Insert(request.Desc, userID)
 
 	w.Header().Set("Content-Type", "application/json")
 	json.NewEncoder(w).Encode(&response)

@@ -10,11 +10,12 @@ type Todo struct {
 	gorm.Model
 	Desc   string `json:"desc,omitempty"`
 	Status bool   `json:"status,omitempty"`
+	UserID int64  `json:"-"`
 }
 
 func (t *Todo) Get(dbConn *gorm.DB) []Todo {
 	var todos = make([]Todo, 0)
-	dbConn.Find(&todos)
+	dbConn.Where("user_id = ?", t.UserID).Find(&todos)
 	return todos
 }
 

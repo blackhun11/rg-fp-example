@@ -32,9 +32,11 @@ func NewAuth(redisClient *redis.Client, dbConn *gorm.DB) Contract {
 
 func (a *Auth) Login(username, password string) string {
 
-	auth := model.Auth{}
+	auth := model.Auth{
+		Username: username,
+	}
 
-	a.dbConn.Where("username = ?", username).Find(&auth)
+	auth.FindByUsername(a.dbConn)
 
 	hashedPassword := getSHA384Password(password, auth.Salt)
 
@@ -43,7 +45,7 @@ func (a *Auth) Login(username, password string) string {
 	}
 
 	sessionToken := uuid.NewString()
-	a.redisClient.Set(context.TODO(), sessionToken, auth.Username, 30*time.Minute)
+	a.redisClient.Set(context.TODO(), sessionToken, auth.ID, 30*time.Minute)
 
 	return sessionToken
 }
@@ -51,12 +53,14 @@ func (a *Auth) Login(username, password string) string {
 func (a *Auth) Register(username, password, fullname string) {
 	salt := uuid.NewString()
 	hashedPassword := getSHA384Password(password, salt)
-	a.dbConn.Create(&model.Auth{
+	auth := &model.Auth{
 		Username: username,
 		Password: hashedPassword,
 		Salt:     salt,
 		Fullname: fullname,
-	})
+	}
+
+	auth.Create(a.dbConn)
 }
 
 func (a *Auth) Logout(sessionToken string) {
