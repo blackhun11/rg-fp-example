@@ -54,15 +54,11 @@ func (h Handler) Todo(w http.ResponseWriter, r *http.Request) {
 //	@Success		200				{object}	[]model.Todo
 //	@Router			/todo/get [get]
 func (h Handler) Get(w http.ResponseWriter, r *http.Request) {
-	if userIDstr, ok := r.Context().Value("user_id").(string); ok {
-		userID, _ := strconv.ParseInt(userIDstr, 10, 64)
-		todos := h.Contract.Get(userID)
-		w.Header().Add("Content-Type", "application/json")
-		json.NewEncoder(w).Encode(&todos)
-		return
-	}
-	w.WriteHeader(http.StatusForbidden)
-	w.Write([]byte("Forbidden"))
+	userIDstr := r.Context().Value("user_id").(string)
+	userID, _ := strconv.ParseInt(userIDstr, 10, 64)
+	todos := h.Contract.Get(userID)
+	w.Header().Add("Content-Type", "application/json")
+	json.NewEncoder(w).Encode(&todos)
 }
 
 //	@Summary		Insert Todo List
