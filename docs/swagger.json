@@ -1,0 +1,405 @@
+{
+    "swagger": "2.0",
+    "info": {
+        "description": "TODO Server",
+        "title": "Swagger TODO",
+        "termsOfService": "http://swagger.io/terms/",
+        "contact": {
+            "name": "Ferianto Surya Wijaya",
+            "url": "https://feriantosw.my.id",
+            "email": "feriantosw77@gmail.com"
+        },
+        "license": {
+            "name": "Apache 2.0",
+            "url": "http://www.apache.org/licenses/LICENSE-2.0.html"
+        },
+        "version": "1.0"
+    },
+    "host": "localhost:8080",
+    "basePath": "/",
+    "paths": {
+        "/auth/doLogin": {
+            "post": {
+                "security": [
+                    {
+                        "BasicAuth": []
+                    }
+                ],
+                "description": "Login API using basic auth",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Auth"
+                ],
+                "summary": "Login API",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "Session Token from Login",
+                        "name": "SESSION_TOKEN",
+                        "in": "header"
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/wb_app_handler_auth.Response"
+                        }
+                    },
+                    "401": {
+                        "description": "Unauthorized",
+                        "schema": {
+                            "$ref": "#/definitions/wb_app_handler_auth.Response"
+                        }
+                    }
+                }
+            }
+        },
+        "/auth/doRegister": {
+            "post": {
+                "description": "Register API",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Auth"
+                ],
+                "summary": "Register API",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "Session Token from Login",
+                        "name": "SESSION_TOKEN",
+                        "in": "header"
+                    },
+                    {
+                        "description": "request body",
+                        "name": "data",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/wb_app_handler_auth.Request"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/wb_app_handler_auth.Response"
+                        }
+                    }
+                }
+            }
+        },
+        "/auth/logout": {
+            "post": {
+                "description": "Logout API",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Auth"
+                ],
+                "summary": "Logout API",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "Session Token from Login",
+                        "name": "SESSION_TOKEN",
+                        "in": "header"
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/wb_app_handler_auth.Response"
+                        }
+                    }
+                }
+            }
+        },
+        "/healthcheck": {
+            "get": {
+                "description": "Do Healthcheck",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "text/plain"
+                ],
+                "tags": [
+                    "Healthcheck"
+                ],
+                "summary": "Healthcheck",
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "type": "string"
+                        }
+                    }
+                }
+            }
+        },
+        "/todo/delete": {
+            "post": {
+                "description": "Soft Delete Todo List that already done by Allowed Session",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Todo"
+                ],
+                "summary": "Delete Todo List",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "Session Token from Login",
+                        "name": "SESSION_TOKEN",
+                        "in": "header",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/wb_app_handler_todo.Response"
+                        }
+                    }
+                }
+            }
+        },
+        "/todo/get": {
+            "get": {
+                "description": "Get Todo List by Allowed Session",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Todo"
+                ],
+                "summary": "Get Todo List",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "Session Token from Login",
+                        "name": "SESSION_TOKEN",
+                        "in": "header",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "type": "array",
+                            "items": {
+                                "$ref": "#/definitions/model.Todo"
+                            }
+                        }
+                    }
+                }
+            }
+        },
+        "/todo/insert": {
+            "post": {
+                "description": "Insert Todo List by Allowed Session",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Todo"
+                ],
+                "summary": "Insert Todo List",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "Session Token from Login",
+                        "name": "SESSION_TOKEN",
+                        "in": "header",
+                        "required": true
+                    },
+                    {
+                        "description": "todo data",
+                        "name": "data",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/wb_app_handler_todo.Request"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/wb_app_handler_todo.Response"
+                        }
+                    }
+                }
+            }
+        },
+        "/todo/update": {
+            "post": {
+                "description": "Update Todo List by Allowed Session",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Todo"
+                ],
+                "summary": "Update Todo List",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "Session Token from Login",
+                        "name": "SESSION_TOKEN",
+                        "in": "header",
+                        "required": true
+                    },
+                    {
+                        "description": "todo data",
+                        "name": "data",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/wb_app_handler_todo.Request"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/wb_app_handler_todo.Response"
+                        }
+                    }
+                }
+            }
+        }
+    },
+    "definitions": {
+        "gorm.DeletedAt": {
+            "type": "object",
+            "properties": {
+                "time": {
+                    "type": "string"
+                },
+                "valid": {
+                    "description": "Valid is true if Time is not NULL",
+                    "type": "boolean"
+                }
+            }
+        },
+        "model.Todo": {
+            "type": "object",
+            "properties": {
+                "createdAt": {
+                    "type": "string"
+                },
+                "deletedAt": {
+                    "$ref": "#/definitions/gorm.DeletedAt"
+                },
+                "desc": {
+                    "type": "string"
+                },
+                "id": {
+                    "type": "integer"
+                },
+                "status": {
+                    "type": "boolean"
+                },
+                "updatedAt": {
+                    "type": "string"
+                }
+            }
+        },
+        "wb_app_handler_auth.Request": {
+            "description": "Request body for register",
+            "type": "object",
+            "properties": {
+                "fullname": {
+                    "type": "string"
+                },
+                "password": {
+                    "type": "string"
+                },
+                "username": {
+                    "type": "string"
+                }
+            }
+        },
+        "wb_app_handler_auth.Response": {
+            "description": "Response for login and register",
+            "type": "object",
+            "properties": {
+                "message": {
+                    "description": "Message: message response that will be used for alert",
+                    "type": "string"
+                }
+            }
+        },
+        "wb_app_handler_todo.Request": {
+            "description": "Request for insert and update for update, fill id and status for insert, fill desc",
+            "type": "object",
+            "properties": {
+                "desc": {
+                    "description": "Desc: description of todo, for INSERT",
+                    "type": "string",
+                    "example": "my todo"
+                },
+                "id": {
+                    "description": "ID: id of todo, for UPDATE",
+                    "type": "integer",
+                    "example": 1
+                },
+                "status": {
+                    "description": "Status: status of todo, for UPDATE\n* true - Todo is done\n* false - Todo is not done",
+                    "type": "boolean",
+                    "example": true
+                }
+            }
+        },
+        "wb_app_handler_todo.Response": {
+            "description": "Response for insert update and delete",
+            "type": "object",
+            "properties": {
+                "message": {
+                    "description": "Message: message response that will be used for alert",
+                    "type": "string"
+                }
+            }
+        }
+    },
+    "securityDefinitions": {
+        "BasicAuth": {
+            "type": "basic"
+        }
+    }
+}

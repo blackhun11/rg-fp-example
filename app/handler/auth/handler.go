@@ -12,6 +12,19 @@ type Handler struct {
 	auth.Contract
 }
 
+//	@Description	Request body for register
+type Request struct {
+	Username string `json:"username,omitempty"`
+	Password string `json:"password,omitempty"`
+	Fullname string `json:"fullname,omitempty"`
+}
+
+//	@Description	Response for login and register
+type Response struct {
+	// Message: message response that will be used for alert
+	Message string `json:"message,omitempty"`
+}
+
 func (h Handler) RegisterPage(w http.ResponseWriter, r *http.Request) {
 	var filepath = path.Join("views", "register.html")
 	var tmpl, err = template.ParseFiles(filepath)
@@ -36,16 +49,24 @@ func (h Handler) LoginPage(w http.ResponseWriter, r *http.Request) {
 	}
 }
 
+//	@Summary		Login API
+//	@Description	Login API using basic auth
+//	@Tags			Auth
+//	@Accept			json
+//	@Produce		json
+//	@Param			SESSION_TOKEN	header		string	false	"Session Token from Login"
+//  @Security BasicAuth
+//	@Success		200				{object}	Response
+//	@Failure		401				{object}	Response
+//	@Router			/auth/doLogin [post]
 func (h Handler) DoLogin(w http.ResponseWriter, r *http.Request) {
 	username, password, ok := r.BasicAuth()
-	var response struct {
-		Message string `json:"message,omitempty"`
-	}
+	var response Response
 	if !ok {
 		response.Message = "Format basic auth salah"
 
 		w.WriteHeader(http.StatusUnauthorized)
-		w.Header().Set("Content-Type", "application/json")
+		w.Header().Add("Content-Type", "application/json")
 		json.NewEncoder(w).Encode(&response)
 		return
 	}
@@ -55,7 +76,7 @@ func (h Handler) DoLogin(w http.ResponseWriter, r *http.Request) {
 	if sessionToken == "" {
 		response.Message = "username / password salah"
 		w.WriteHeader(http.StatusUnauthorized)
-		w.Header().Set("Content-Type", "application/json")
+		w.Header().Add("Content-Type", "application/json")
 		json.NewEncoder(w).Encode(&response)
 		return
 	}
@@ -67,30 +88,41 @@ func (h Handler) DoLogin(w http.ResponseWriter, r *http.Request) {
 		Value: sessionToken,
 		Path:  "/",
 	})
-	w.Header().Set("Content-Type", "application/json")
+	w.Header().Add("Content-Type", "application/json")
 	json.NewEncoder(w).Encode(&response)
 }
 
+//	@Summary		Register API
+//	@Description	Register API
+//	@Tags			Auth
+//	@Accept			json
+//	@Produce		json
+//	@Param			SESSION_TOKEN	header		string	false	"Session Token from Login"
+//	@Param			data	body		Request	true	"request body"
+//	@Success		200				{object}	Response
+//	@Router			/auth/doRegister [post]
 func (h Handler) DoRegister(w http.ResponseWriter, r *http.Request) {
 
-	var request struct {
-		Username string `json:"username,omitempty"`
-		Password string `json:"password,omitempty"`
-		Fullname string `json:"fullname,omitempty"`
-	}
+	var request Request
 
-	var response struct {
-		Message string `json:"message,omitempty"`
-	}
+	var response Response
 
 	json.NewDecoder(r.Body).Decode(&request)
 	h.Contract.Register(request.Username, request.Password, request.Fullname)
 	response.Message = "Success To Register"
 
-	w.Header().Set("Content-Type", "application/json")
+	w.Header().Add("Content-Type", "application/json")
 	json.NewEncoder(w).Encode(&response)
 }
 
+//	@Summary		Logout API
+//	@Description	Logout API
+//	@Tags			Auth
+//	@Accept			json
+//	@Produce		json
+//	@Param			SESSION_TOKEN	header		string	false	"Session Token from Login"
+//	@Success		200				{object}	Response
+//	@Router			/auth/logout [post]
 func (h Handler) Logout(w http.ResponseWriter, r *http.Request) {
 	var response struct {
 		Message string `json:"message,omitempty"`
@@ -100,7 +132,7 @@ func (h Handler) Logout(w http.ResponseWriter, r *http.Request) {
 	cookie, err := r.Cookie("SESSION_TOKEN")
 	if err != nil {
 		response.Message = "No session"
-		w.Header().Set("Content-Type", "application/json")
+		w.Header().Add("Content-Type", "application/json")
 		json.NewEncoder(w).Encode(&response)
 		return
 	}
@@ -112,6 +144,6 @@ func (h Handler) Logout(w http.ResponseWriter, r *http.Request) {
 		Path:   "/",
 		MaxAge: -1,
 	})
-	w.Header().Set("Content-Type", "application/json")
+	w.Header().Add("Content-Type", "application/json")
 	json.NewEncoder(w).Encode(&response)
 }

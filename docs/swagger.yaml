@@ -1,0 +1,272 @@
+basePath: /
+definitions:
+  gorm.DeletedAt:
+    properties:
+      time:
+        type: string
+      valid:
+        description: Valid is true if Time is not NULL
+        type: boolean
+    type: object
+  model.Todo:
+    properties:
+      createdAt:
+        type: string
+      deletedAt:
+        $ref: '#/definitions/gorm.DeletedAt'
+      desc:
+        type: string
+      id:
+        type: integer
+      status:
+        type: boolean
+      updatedAt:
+        type: string
+    type: object
+  wb_app_handler_auth.Request:
+    description: Request body for register
+    properties:
+      fullname:
+        type: string
+      password:
+        type: string
+      username:
+        type: string
+    type: object
+  wb_app_handler_auth.Response:
+    description: Response for login and register
+    properties:
+      message:
+        description: 'Message: message response that will be used for alert'
+        type: string
+    type: object
+  wb_app_handler_todo.Request:
+    description: Request for insert and update for update, fill id and status for
+      insert, fill desc
+    properties:
+      desc:
+        description: 'Desc: description of todo, for INSERT'
+        example: my todo
+        type: string
+      id:
+        description: 'ID: id of todo, for UPDATE'
+        example: 1
+        type: integer
+      status:
+        description: |-
+          Status: status of todo, for UPDATE
+          * true - Todo is done
+          * false - Todo is not done
+        example: true
+        type: boolean
+    type: object
+  wb_app_handler_todo.Response:
+    description: Response for insert update and delete
+    properties:
+      message:
+        description: 'Message: message response that will be used for alert'
+        type: string
+    type: object
+host: localhost:8080
+info:
+  contact:
+    email: feriantosw77@gmail.com
+    name: Ferianto Surya Wijaya
+    url: https://feriantosw.my.id
+  description: TODO Server
+  license:
+    name: Apache 2.0
+    url: http://www.apache.org/licenses/LICENSE-2.0.html
+  termsOfService: http://swagger.io/terms/
+  title: Swagger TODO
+  version: "1.0"
+paths:
+  /auth/doLogin:
+    post:
+      consumes:
+      - application/json
+      description: Login API using basic auth
+      parameters:
+      - description: Session Token from Login
+        in: header
+        name: SESSION_TOKEN
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/wb_app_handler_auth.Response'
+        "401":
+          description: Unauthorized
+          schema:
+            $ref: '#/definitions/wb_app_handler_auth.Response'
+      security:
+      - BasicAuth: []
+      summary: Login API
+      tags:
+      - Auth
+  /auth/doRegister:
+    post:
+      consumes:
+      - application/json
+      description: Register API
+      parameters:
+      - description: Session Token from Login
+        in: header
+        name: SESSION_TOKEN
+        type: string
+      - description: request body
+        in: body
+        name: data
+        required: true
+        schema:
+          $ref: '#/definitions/wb_app_handler_auth.Request'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/wb_app_handler_auth.Response'
+      summary: Register API
+      tags:
+      - Auth
+  /auth/logout:
+    post:
+      consumes:
+      - application/json
+      description: Logout API
+      parameters:
+      - description: Session Token from Login
+        in: header
+        name: SESSION_TOKEN
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/wb_app_handler_auth.Response'
+      summary: Logout API
+      tags:
+      - Auth
+  /healthcheck:
+    get:
+      consumes:
+      - application/json
+      description: Do Healthcheck
+      produces:
+      - text/plain
+      responses:
+        "200":
+          description: OK
+          schema:
+            type: string
+      summary: Healthcheck
+      tags:
+      - Healthcheck
+  /todo/delete:
+    post:
+      consumes:
+      - application/json
+      description: Soft Delete Todo List that already done by Allowed Session
+      parameters:
+      - description: Session Token from Login
+        in: header
+        name: SESSION_TOKEN
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/wb_app_handler_todo.Response'
+      summary: Delete Todo List
+      tags:
+      - Todo
+  /todo/get:
+    get:
+      consumes:
+      - application/json
+      description: Get Todo List by Allowed Session
+      parameters:
+      - description: Session Token from Login
+        in: header
+        name: SESSION_TOKEN
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            items:
+              $ref: '#/definitions/model.Todo'
+            type: array
+      summary: Get Todo List
+      tags:
+      - Todo
+  /todo/insert:
+    post:
+      consumes:
+      - application/json
+      description: Insert Todo List by Allowed Session
+      parameters:
+      - description: Session Token from Login
+        in: header
+        name: SESSION_TOKEN
+        required: true
+        type: string
+      - description: todo data
+        in: body
+        name: data
+        required: true
+        schema:
+          $ref: '#/definitions/wb_app_handler_todo.Request'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/wb_app_handler_todo.Response'
+      summary: Insert Todo List
+      tags:
+      - Todo
+  /todo/update:
+    post:
+      consumes:
+      - application/json
+      description: Update Todo List by Allowed Session
+      parameters:
+      - description: Session Token from Login
+        in: header
+        name: SESSION_TOKEN
+        required: true
+        type: string
+      - description: todo data
+        in: body
+        name: data
+        required: true
+        schema:
+          $ref: '#/definitions/wb_app_handler_todo.Request'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/wb_app_handler_todo.Response'
+      summary: Update Todo List
+      tags:
+      - Todo
+securityDefinitions:
+  BasicAuth:
+    type: basic
+swagger: "2.0"

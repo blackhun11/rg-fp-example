@@ -17,6 +17,22 @@ import (
 
 var redisClient *redis.Client
 
+//	@title			Swagger TODO
+//	@version		1.0
+//	@description	TODO Server
+//	@termsOfService	http://swagger.io/terms/
+
+//	@contact.name	Ferianto Surya Wijaya
+//	@contact.url	https://feriantosw.my.id
+//	@contact.email	feriantosw77@gmail.com
+
+//	@license.name	Apache 2.0
+//	@license.url	http://www.apache.org/licenses/LICENSE-2.0.html
+// @securityDefinitions.basic BasicAuth
+// @in header
+// @name Authorization
+//	@host		localhost:8080
+//	@BasePath	/
 func main() {
 	dbConn, err := db.ConnectPG()
 	if err != nil {
@@ -40,19 +56,48 @@ func main() {
 		Contract: authController,
 	}
 
-	http.Handle("/todo", Auth(RequestMethodGet(http.HandlerFunc(todoHandler.Todo)), false))
-	http.Handle("/todo/get", Auth(RequestMethodGet(http.HandlerFunc(todoHandler.Get)), false))
-	http.Handle("/todo/insert", Auth(RequestMethodPost(http.HandlerFunc(todoHandler.Insert)), false))
-	http.Handle("/todo/update", Auth(RequestMethodPost(http.HandlerFunc(todoHandler.Update)), false))
-	http.Handle("/todo/delete", Auth(RequestMethodPost(http.HandlerFunc(todoHandler.Delete)), false))
+	http.Handle("/todo", AllowCORS(Auth(RequestMethodGet(http.HandlerFunc(todoHandler.Todo)), false)))
+	http.Handle("/todo/get", AllowCORS(Auth(RequestMethodGet(http.HandlerFunc(todoHandler.Get)), false)))
+	http.Handle("/todo/insert", AllowCORS(Auth(RequestMethodPost(http.HandlerFunc(todoHandler.Insert)), false)))
+	http.Handle("/todo/update", AllowCORS(Auth(RequestMethodPost(http.HandlerFunc(todoHandler.Update)), false)))
+	http.Handle("/todo/delete", AllowCORS(Auth(RequestMethodPost(http.HandlerFunc(todoHandler.Delete)), false)))
 
-	http.Handle("/auth/register", Auth(RequestMethodGet(http.HandlerFunc(authHandler.RegisterPage)), true))
-	http.Handle("/auth/login", Auth(RequestMethodGet((http.HandlerFunc(authHandler.LoginPage))), true))
-	http.Handle("/auth/doRegister", Auth(RequestMethodPost(http.HandlerFunc(authHandler.DoRegister)), true))
-	http.Handle("/auth/doLogin", Auth(RequestMethodPost(http.HandlerFunc(authHandler.DoLogin)), true))
-	http.Handle("/auth/logout", RequestMethodGet(http.HandlerFunc(authHandler.Logout)))
+	http.Handle("/auth/register", AllowCORS(Auth(RequestMethodGet(http.HandlerFunc(authHandler.RegisterPage)), true)))
+	http.Handle("/auth/login", AllowCORS(Auth(RequestMethodGet((http.HandlerFunc(authHandler.LoginPage))), true)))
+	http.Handle("/auth/doRegister", AllowCORS(Auth(RequestMethodPost(http.HandlerFunc(authHandler.DoRegister)), true)))
+	http.Handle("/auth/doLogin", AllowCORS(Auth(RequestMethodPost(http.HandlerFunc(authHandler.DoLogin)), true)))
+	http.Handle("/auth/logout", AllowCORS(RequestMethodGet(http.HandlerFunc(authHandler.Logout))))
+
+	http.Handle("/healthcheck", AllowCORS(http.HandlerFunc(healthcheck)))
+	go ServeSwagger()
 
 	http.ListenAndServe(":8080", nil)
+}
+
+// Healthcheck   godoc
+//	@Summary		Healthcheck
+//	@Description	Do Healthcheck
+//	@Tags			Healthcheck
+//	@Accept			json
+//	@Produce		plain
+//	@Success		200	string	healthy
+//	@Router			/healthcheck [get]
+func healthcheck(w http.ResponseWriter, r *http.Request) {
+	w.Write([]byte("healthy"))
+}
+
+func AllowCORS(next http.Handler) http.Handler {
+	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		w.Header().Add("Access-Control-Allow-Origin", "*")
+		w.Header().Add("Access-Control-Allow-Methods", "POST, GET, OPTIONS, DELETE")
+		w.Header().Add("Access-Control-Allow-Headers", "*")
+		if r.Method == http.MethodOptions {
+			w.WriteHeader(http.StatusOK)
+			return
+		}
+
+		next.ServeHTTP(w, r)
+	})
 }
 
 func RequestMethodGet(next http.Handler) http.Handler {
