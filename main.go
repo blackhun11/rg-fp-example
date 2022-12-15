@@ -26,13 +26,13 @@ var redisClient *redis.Client
 //	@contact.url	https://feriantosw.my.id
 //	@contact.email	feriantosw77@gmail.com
 
-//	@license.name	Apache 2.0
-//	@license.url	http://www.apache.org/licenses/LICENSE-2.0.html
-// @securityDefinitions.basic BasicAuth
-// @in header
-// @name Authorization
-//	@host		localhost:8080
-//	@BasePath	/
+//	@license.name				Apache 2.0
+//	@license.url				http://www.apache.org/licenses/LICENSE-2.0.html
+//	@securityDefinitions.basic	BasicAuth
+//	@in							header
+//	@name						Authorization
+//	@host						localhost:8080
+//	@BasePath					/
 func main() {
 	dbConn, err := db.ConnectPG()
 	if err != nil {

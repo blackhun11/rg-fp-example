@@ -54,10 +54,10 @@ func (h Handler) LoginPage(w http.ResponseWriter, r *http.Request) {
 //	@Tags			Auth
 //	@Accept			json
 //	@Produce		json
-//	@Param			SESSION_TOKEN	header		string	false	"Session Token from Login"
-//  @Security BasicAuth
-//	@Success		200				{object}	Response
-//	@Failure		401				{object}	Response
+//	@Param			SESSION_TOKEN	header	string	false	"Session Token from Login"
+//	@Security		BasicAuth
+//	@Success		200	{object}	Response
+//	@Failure		401	{object}	Response
 //	@Router			/auth/doLogin [post]
 func (h Handler) DoLogin(w http.ResponseWriter, r *http.Request) {
 	username, password, ok := r.BasicAuth()
@@ -98,7 +98,7 @@ func (h Handler) DoLogin(w http.ResponseWriter, r *http.Request) {
 //	@Accept			json
 //	@Produce		json
 //	@Param			SESSION_TOKEN	header		string	false	"Session Token from Login"
-//	@Param			data	body		Request	true	"request body"
+//	@Param			data			body		Request	true	"request body"
 //	@Success		200				{object}	Response
 //	@Router			/auth/doRegister [post]
 func (h Handler) DoRegister(w http.ResponseWriter, r *http.Request) {
