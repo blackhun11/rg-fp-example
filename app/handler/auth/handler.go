@@ -136,7 +136,7 @@ func (h Handler) Logout(w http.ResponseWriter, r *http.Request) {
 		json.NewEncoder(w).Encode(&response)
 		return
 	}
-	h.Contract.Logout(cookie.Name)
+	h.Contract.Logout(cookie.Value)
 
 	http.SetCookie(w, &http.Cookie{
 		Name:   "SESSION_TOKEN",
