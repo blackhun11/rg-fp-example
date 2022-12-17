@@ -1,0 +1,15 @@
+version: '3'
+services: 
+    app:
+        restart: always
+        build: .
+        ports: 
+            - "8080:8080" # "host:container"
+            - "1323:1323"
+        environment:
+            - postgres_host=postgres
+    redis:
+        image: redis:latest
+        restart: always
+        ports:
+            - "6380:6379"

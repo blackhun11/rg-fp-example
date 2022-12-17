@@ -2,6 +2,7 @@ package main
 
 import (
 	"context"
+	"log"
 	"net/http"
 	cTodo "wb/app/controller/todo"
 	hTodo "wb/app/handler/todo"
@@ -17,7 +18,7 @@ import (
 
 var redisClient *redis.Client
 
-//	@title			Swagger TODO
+//	@title			Swagger GENERATE KE 3
 //	@version		1.0
 //	@description	TODO Server
 //	@termsOfService	http://swagger.io/terms/
@@ -56,12 +57,14 @@ func main() {
 		Contract: authController,
 	}
 
+	// mencegah untuk yang belum login ke todo
 	http.Handle("/todo", AllowCORS(Auth(RequestMethodGet(http.HandlerFunc(todoHandler.Todo)), false)))
 	http.Handle("/todo/get", AllowCORS(Auth(RequestMethodGet(http.HandlerFunc(todoHandler.Get)), false)))
 	http.Handle("/todo/insert", AllowCORS(Auth(RequestMethodPost(http.HandlerFunc(todoHandler.Insert)), false)))
 	http.Handle("/todo/update", AllowCORS(Auth(RequestMethodPost(http.HandlerFunc(todoHandler.Update)), false)))
 	http.Handle("/todo/delete", AllowCORS(Auth(RequestMethodPost(http.HandlerFunc(todoHandler.Delete)), false)))
 
+	// mencegah untuk yang udah login ke auth
 	http.Handle("/auth/register", AllowCORS(Auth(RequestMethodGet(http.HandlerFunc(authHandler.RegisterPage)), true)))
 	http.Handle("/auth/login", AllowCORS(Auth(RequestMethodGet((http.HandlerFunc(authHandler.LoginPage))), true)))
 	http.Handle("/auth/doRegister", AllowCORS(Auth(RequestMethodPost(http.HandlerFunc(authHandler.DoRegister)), true)))
@@ -71,10 +74,10 @@ func main() {
 	http.Handle("/healthcheck", AllowCORS(http.HandlerFunc(healthcheck)))
 	go ServeSwagger()
 
+	log.Println("Application Running")
 	http.ListenAndServe(":8080", nil)
 }
 
-// Healthcheck   godoc
 //	@Summary		Healthcheck
 //	@Description	Do Healthcheck
 //	@Tags			Healthcheck
@@ -127,22 +130,28 @@ func RequestMethodPost(next http.Handler) http.Handler {
 func Auth(next http.Handler, isAuthPage bool) http.Handler {
 	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		cookie, err := r.Cookie("SESSION_TOKEN")
+		// no cookie --> redirect to login
 		if err != nil {
 			if isAuthPage {
 				next.ServeHTTP(w, r)
 				return
 			}
-
+			// redirect to login
 			http.Redirect(w, r, "/auth/login", http.StatusSeeOther)
 			return
 		}
 
+		// have cookie but auth page --> redirect to todo
 		if isAuthPage {
 			http.Redirect(w, r, "/todo", http.StatusSeeOther)
 			return
 		}
 
+		// cookie:user_id
+		// have cookie --> do cookie validation
 		userID, err := redisClient.Get(context.TODO(), cookie.Value).Result()
+
+		// have error --> cookie not valid, delete the cookie
 		if err != nil {
 			http.SetCookie(w, &http.Cookie{
 				Name:   "SESSION_TOKEN",
@@ -153,6 +162,8 @@ func Auth(next http.Handler, isAuthPage bool) http.Handler {
 			http.Redirect(w, r, "/auth/login", http.StatusSeeOther)
 			return
 		}
+
+		// cookie valid --> pass the user id via context
 		ctx := context.WithValue(r.Context(), "user_id", userID)
 
 		next.ServeHTTP(w, r.WithContext(ctx))

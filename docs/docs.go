@@ -417,7 +417,7 @@ var SwaggerInfo = &swag.Spec{
 	Host:             "localhost:8080",
 	BasePath:         "/",
 	Schemes:          []string{},
-	Title:            "Swagger TODO",
+	Title:            "Swagger GENERATE KE 3",
 	Description:      "TODO Server",
 	InfoInstanceName: "swagger",
 	SwaggerTemplate:  docTemplate,
